@@ -1,36 +1,5 @@
-# RulesMigrator
+# Rules Migrator
 
-<p id="start" align="center">
-<br>
-<a href="#start"><img height="130rem" src="https://raw.githubusercontent.com/xnbox/DeepfakeHTTP/main/img/logo.png"></a>
-<br><br>
-<a href="#start"><img width="250rem" src="https://raw.githubusercontent.com/xnbox/DeepfakeHTTP/main/img/logo_text.png"></a>
-<h1></h1>
-</p>
-
-<a title="License MIT" href="https://github.com/xnbox/DeepfakeHTTP/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square"></a>
-<a title="Latest release" href="https://github.com/xnbox/DeepfakeHTTP/releases"><img src="https://img.shields.io/github/v/release/xnbox/DeepfakeHTTP?style=flat-square&color=28A745"></a>
-<a title="Powered by Tommy" href="https://github.com/xnbox/tommy"><img src="https://img.shields.io/badge/powered_by-Tommy-blueviolet?style=flat-square"></a>
-<br>
-<p id="banner" align="center">
-<br>
-<a href="#banner"><img width="98%" src="https://raw.githubusercontent.com/xnbox/DeepfakeHTTP/main/img/text.png" alt="YOUR 100% STATIC DYNAMIC BACKEND"></a>
-<table>
-<tr>
-<td>
-<a href="#banner"><img align="left" src="https://raw.githubusercontent.com/xnbox/DeepfakeHTTP/main/img/image1.png" width="190"></a>
-<h3>What are people using it for?</h3>
-<ul>
-    <li>Creating the product PoC or demo before even starting out with the backend</li>
-    <li>REST, GraphQL, and other APIs mocking and testing</li>
-    <li>Hiding critical enterprise infrastructure behind a simple static facade</li>
-    <li>Hacking and fine-tuning HTTP communications on both server and client sides</li>
-</ul>
-<img width="1000" height="0">
-</td>
-</tr>
-</table>
-</p>
 <p align="center">
 <a href="#get-started">Get started</a> | <a href="#usage">Usage</a> | <a href="#usage-exampes">Usage Examples</a> | <a href="#how-does-it-work">How does it work?</a> | <a href="#features">Features</a> | <a href="#appendix-boptional-request--response-headers">Optional Headers</a> | <a href="#appendix-acommand-line-options">CLI</a> | <a href="Cheatsheet.md">Cheatsheet</a>
 </p>
