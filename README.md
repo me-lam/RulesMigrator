@@ -1,49 +1,30 @@
 # Rules Migrator
 
 <p align="center">
-<a href="#get-started">Get started</a> | <a href="#usage">Usage</a> | <a href="#usage-exampes">Usage Examples</a> | <a href="#how-does-it-work">How does it work?</a> | <a href="#features">Features</a> | <a href="#appendix-boptional-request--response-headers">Optional Headers</a> | <a href="#appendix-acommand-line-options">CLI</a> | <a href="Cheatsheet.md">Cheatsheet</a>
+<a href="#introduction">Introduction</a> | <a href="#usage">Usage</a> | <a href="#usage-exampes">Usage Examples</a> | <a href="#how-does-it-work">How does it work?</a> | <a href="#features">Features</a> | <a href="#appendix-boptional-request--response-headers">Optional Headers</a> | <a href="#appendix-acommand-line-options">CLI</a> | <a href="Cheatsheet.md">Cheatsheet</a>
 </p>
 
-<h2>Get started</h2>
+<h2>Introduction</h2>
 
-<ol>
-    <li>Download the <a href="https://github.com/xnbox/DeepfakeHTTP/releases/latest">latest release</a> of <code>df.jar</code></li>
-    <li>Copy-paste the content of the dump example to the file <code>dump.txt</code>:
-<span></span>
+This tool migrates PowerTrack rules from one stream to another. It uses the Rules API to get rules from a **```Source```** stream, and adds those rules to a **```Target```** stream. There is also an option to write the JSON payloads to a local file for review, and later loading into the 'Target' system.
 
-```httpx
-GET /api/customer/123 HTTP/1.1
+This tool has four main use-cases:
++ Provides feedback on your version 1.0 ruleset readiness for real-time PowerTrack 2.0.
++ Clones PowerTrack version 1.0 (PT 1.0) rules to PowerTrack version 2.0 (PT 2.0).
++ Clones real-time rules to Replay streams. 
++ Clones rules between real-time streams, such as 'dev' to 'prod' streams.
 
-HTTP/1.1 200 OK
-Content-Type: application/json
+If you are deploying a new PowerTrack 2.0 stream, this tool can be use to create your 2.0 ruleset, translating syntax when necessary, dropping rules when necessary, then either writing directly to the Rules API 2.0 endpoint or writing to a file for verification.
+ 
+Given the potential high volumes of real-time Twitter data, it is a best practice to review any and all rules before adding to a live production stream. It is highly recommended that you initially build your ruleset on a non-production stream before moving to a production stream. Most Gnip customers have a development/sandbox stream deployed for their internal testing. If you have never had a 'dev' stream for development and testing, they come highly recommended. If you are migrating to PowerTrack 2.0, you have the option to use the new PowerTrack 2.0 stream as a development stream during the 30-day migration period. 
 
-{
-    "id": 123,
-    "fname": "John",
-    "lname": "Doe",
-    "email": ["john@example.com", "johndoe@example.com"]
-}
-```
+After testing your rules on your development stream, you can also use this tool to copy them to your 2.0 production stream.
 
-</li>
-<li>Start the server from command line:
+For more information on migrating PowerTrack rules from one stream to another, see [this Gnip support article](http://support.gnip.com/articles/migrating-powertrack-rules.html).
 
-```
-java -jar df.jar --dump dump.txt
-```
-</li>
-    <li>Use a browser to check whether the server is running:
-<br>
-<pre><a href="http://localhost:8080/api/customer/123">http://localhost:8080/api/customer/123</a></pre>
-</li>
-<li>Get response:<br>
-<a href="#get-started"><img src="https://raw.githubusercontent.com/xnbox/DeepfakeHTTP/main/img/get-started.png"></a>
-</li>
-</ol>
-That's it!
+The rest of this document focuses on the Ruby example app developed to migrate rules.
+
 <br><br>
-For more examples see the <a href="Cheatsheet.md">cheatsheet</a>.<br>
-Also take look at <a href="https://github.com/xnbox/DeepfakeHTTP/tree/main/PetClinic/README#readme">REST version of the Spring PetClinic built with DeepfakeHTTP</a>.
 
 <h2>Usage</h2>
 
