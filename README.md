@@ -159,7 +159,7 @@ Notes that a developer may be interested in:
 
 The heart of this code lives in the **/lib/rules_migrator.py** file. This file defines three core class:
 + **RulesRequester** - This object knows how to make requests to Twitter rules endpoints (PowerTrack and v2 Filtered stream).
-+ **RulesSystem** - This object enscapsulates a rules "system", and there is always a 'source' and a 'destination' system when migrating. Each object has its own requester object and also holds fundamental system stats.
++ **RulesSystem** - This object encapsulates a rules "system", and there is always a 'source' and a 'destination' system when migrating. Each object has its own requester object and also holds fundamental system stats.
 + **RulesMigrator** - This object exposes a 'migrate' method used by calling process (see below). This object also knows how to load credentials and make reports. 
 
 In this project's main directory, there are these three files:
