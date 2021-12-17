@@ -1,381 +1,196 @@
-# Rules Migrator
+# rules-migrator
 
-<ul><a href="#introduction">Introduction</a></ul>
-<ul><a href="#usage">Usage</a></ul>
-<ul><a href="#usage-exampes">Usage Examples</a></ul>
-<ul><a href="#how-does-it-work">How does it work?</a></ul> 
-<ul><a href="#features">Features</a></ul>
+tldr: Migrates rules from one stream to another. Built to help migrate PowerTrack rules to v2 Filtered stream. Also supports transferring rules between two v2 Filtered streams.
 
+Migrating filters involves two stream systems, a 'source' system and a 'destination' system. Rules are transferred from the 'source' system to the 'destination' system. While the source system can be PowerTrack-based or v2 Filtered stream-based, only v2 Filtered stream destinations, by design, are supported. First written to help with PowerTrack migrations to v2, this tool is also designed to be a pure-v2 tool. This tool should help developers move sets of filters between different environments and to 'replay stream' endpoints. 
 
-<h2>Introduction</h2>
+## Getting started
 
-This tool migrates PowerTrack rules from one stream to another. It uses the Rules API to get rules from a **```Source```** stream, and adds those rules to a **```Target```** stream. There is also an option to write the JSON payloads to a local file for review, and later loading into the 'Target' system.
+{getting an approved developer account}
 
-This tool has four main use-cases:
-+ Provides feedback on your version 1.0 ruleset readiness for real-time PowerTrack 2.0.
-+ Clones PowerTrack version 1.0 (PT 1.0) rules to PowerTrack version 2.0 (PT 2.0).
-+ Clones real-time rules to Replay streams. 
-+ Clones rules between real-time streams, such as 'dev' to 'prod' streams.
+There are several ways to use this tool to migrate streaming filters between real-time streams:
++ Run a simple command-line Python script. 
++ Start up a (React-based) web app with user interface used to configure the 'source' and 'destination' streaming systems. 
 
-If you are deploying a new PowerTrack 2.0 stream, this tool can be use to create your 2.0 ruleset, translating syntax when necessary, dropping rules when necessary, then either writing directly to the Rules API 2.0 endpoint or writing to a file for verification.
- 
-Given the potential high volumes of real-time Twitter data, it is a best practice to review any and all rules before adding to a live production stream. It is highly recommended that you initially build your ruleset on a non-production stream before moving to a production stream. Most Gnip customers have a development/sandbox stream deployed for their internal testing. If you have never had a 'dev' stream for development and testing, they come highly recommended. If you are migrating to PowerTrack 2.0, you have the option to use the new PowerTrack 2.0 stream as a development stream during the 30-day migration period. 
+Either way requires some shared Python code that manages the rules migration process. So, the next step is all about getting the Rules Migrator project code and folders set up. 
 
-After testing your rules on your development stream, you can also use this tool to copy them to your 2.0 production stream.
+### Setting up Rules Migrator project folder
 
-For more information on migrating PowerTrack rules from one stream to another, see [this Gnip support article](http://support.gnip.com/articles/migrating-powertrack-rules.html).
+ The ./lib/rules_migrator.py file defines three core objects and the tool's report and some features have the following defaults:
 
-The rest of this document focuses on the Ruby example app developed to migrate rules.
++ ./config/config.yaml - Default name and location of a YAML file used to define 'source' and 'destination' rules systems.
++ ./reports - Default location to write reports to. 
++ ./rules - Default location to read JSON rules files. This tool more typically reads in 'source' rules using the rules API, the tool can also read in a local file containg response JSON from the rules endpoints (either PowerTrack or v2 Filtered stream). 
 
-<br>
-
-<h2>Usage</h2>
-
-<br><br>
-
-<h2>Usage Exampes</h2>
-
-
-<h2>How does it work?</h2>
-<ol>
-	<li>Got the client's request.</li>
-	<li>Search the dump for corresponded entry (request-response pair) by matching all specified request's parts:<br>
-	<i>method</i>, <i>URI</i>, <i>headers</i>, and <i>body</i>.</li>
-	<li>If the entry was found, the server sends the appropriate response to the client.</li>
-	<li>If the entry was not found, the server sends a status <code>404</code>.</li>
-</ol>
-That's all.
-
-<h2>Features</h2>
-
-&nbsp;&nbsp;&nbsp;&nbsp;&check;&nbsp;&nbsp;no dependencies<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&check;&nbsp;&nbsp;no installation<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&check;&nbsp;&nbsp;no configs<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&check;&nbsp;&nbsp;crossplatform<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&check;&nbsp;&nbsp;single-file executable<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&check;&nbsp;&nbsp;command-line interface<br>
-<details>
-<summary>
-    more features&hellip;
-</summary>
-<br>
-
-
-<h2>
-APPENDIX B.
-<br>
-Optional REQUEST / RESPONSE headers
-</h2>
-<table>
-    <tr><th width="220rem">Header</th><th>Description</th></tr>
-<tr></tr>
-    <tr><td valign="top"><pre>X-Delay</pre>
-	<a href="#appendix-boptional-request--response-headers"><img src="https://raw.githubusercontent.com/xnbox/DeepfakeHTTP/main/img/request.svg"></a>
-	<br><a href="#appendix-boptional-request--response-headers"><img src="https://raw.githubusercontent.com/xnbox/DeepfakeHTTP/main/img/response.svg"></a>
-	</td>
-    <td valign="top"><p>Request or response delay (in milliseconds).</p>
-    <i>Examples:</i><br>
-    <br>
-
-Two seconds request delay:<br>
-```httpx
-GET / HTTP/1.1
-X-Delay: 2000
-```
-
-<h2></h2>
-
-Two seconds response delay:<br>
-```httpx
-HTTP/1.1 200 OK
-X-Delay: 2000
-```
-
-</td></tr>
-<tr></tr>
-    <tr><td valign="top"><pre>X-Content-Source</pre>
-	<a href="#appendix-boptional-request--response-headers"><img src="https://raw.githubusercontent.com/xnbox/DeepfakeHTTP/main/img/request.svg"></a>
-	<br><a href="#appendix-boptional-request--response-headers"><img src="https://raw.githubusercontent.com/xnbox/DeepfakeHTTP/main/img/response.svg"></a>
-    </td>
-    <td valign="top">
-    The URL of the externally hosted content.<br>
-    <br>
-    The content from the URL will be sent as the response body.
-    Supported protocols: <code>http:</code>, <code>https:</code>, <code>file:</code>, <code>data:</code>.<br>
-    If the URL provides its own content type and there is no <code>Content-Type</code> header in the dump, the original <code>Content-Type</code> header received from the URL will be sent along with other response headers.
-    <br>
-    This header is useful when you want to send content hosted on a remote server or just send binary data as a response body.<br>
-	<br>
-    <i>Examples:</i>
-<br><br>
-
-Get a response body from a remote server:<br>
-
-```httpx
-HTTP/1.1 200 OK
-Content-Type: application/json
-X-Content-Source: http://example.com/api/car/1234.json
-```
-
-<h2></h2>
-
-Get a response body from a file:<br>
-
-```httpx
-HTTP/1.1 200 OK
-Content-Type: image/jpeg
-X-Content-Source: file:///home/john/photo.jpeg
-```
-
-<h2></h2>
-
-Get a response body from a data URI:<br>
-
-```httpx
-HTTP/1.1 200 OK
-Content-Type: image/gif
-X-Content-Source: data:image/gif;base64,R0lGODlhAQABAIAAAP...
-```
-</td></tr>
-<tr></tr>
-    <tr id="X-OpenAPI-Summary"><td valign="top"><pre>X-OpenAPI-Summary</pre>
-	<a href="#appendix-boptional-request--response-headers"><img src="https://raw.githubusercontent.com/xnbox/DeepfakeHTTP/main/img/request.svg"></a>
-    </td>
-    <td valign="top">
-    <p>OpenAPI request summary text.</p>
-    <i>Example:</i>
-
-```httpx
-GET /api/customer{id} HTTP/1.1
-X-OpenAPI-Summary: Get customer information
-```
-<br>See Also:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#X-OpenAPI-Description"><code>X-OpenAPI-Description</code></a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#X-OpenAPI-Tags"><code>X-OpenAPI-Tags</code></a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#X-OpenAPI-Parameters"><code>X-OpenAPI-Parameters</code></a>
-
-</td></tr>
-<tr></tr>
-    <tr id="X-OpenAPI-Description"><td valign="top"><pre>X-OpenAPI-Description</pre>
-	<a href="#appendix-boptional-request--response-headers"><img src="https://raw.githubusercontent.com/xnbox/DeepfakeHTTP/main/img/request.svg"></a>
-    </td>
-    <td valign="top">
-    OpenAPI request description text.<br>
-    <br>
-    <i>Example:</i>
-
-```httpx
-GET /api/customer{id} HTTP/1.1
-X-OpenAPI-Summary: Get customer information
-X-OpenAPI-Description: This API extracts customer info from db
-```
-<br>See Also:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#X-OpenAPI-Summary"><code>X-OpenAPI-Summary</code></a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#X-OpenAPI-Tags"><code>X-OpenAPI-Tags</code></a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#X-OpenAPI-Parameters"><code>X-OpenAPI-Parameters</code></a>
-
-
-</td></tr>
-<tr></tr>
-    <tr id="X-OpenAPI-Tags"><td valign="top"><pre>X-OpenAPI-Tags</pre>
-	<a href="#appendix-boptional-request--response-headers"><img src="https://raw.githubusercontent.com/xnbox/DeepfakeHTTP/main/img/request.svg"></a>
-    </td>
-    <td valign="top">
-    OpenAPI request comma-separated tag list.<br>
-    <br>
-    <i>Example:</i>
-
-```httpx
-GET /api/customer{id} HTTP/1.1
-X-OpenAPI-Summary: Get customer information
-X-OpenAPI-Description: This API extracts customer info from db
-X-OpenAPI-Tags: Work with customer, Buyers, Login info
-```
-<br>See Also:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#X-OpenAPI-Summary"><code>X-OpenAPI-Summary</code></a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#X-OpenAPI-Description"><code>X-OpenAPI-Description</code></a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#X-OpenAPI-Parameters"><code>X-OpenAPI-Parameters</code></a>
-
-</td></tr>
-
-<tr></tr>
-    <tr id="X-OpenAPI-Parameters"><td valign="top"><pre>X-OpenAPI-Parameters</pre>
-	<a href="#appendix-boptional-request--response-headers"><img src="https://raw.githubusercontent.com/xnbox/DeepfakeHTTP/main/img/request.svg"></a>
-    </td>
-    <td valign="top">
-    OpenAPI request parameters information.<br>
-    <br>
-    <i>Example:</i>
-
-```httpx
-GET /api/customer{id} HTTP/1.1
-X-OpenAPI-Summary: Get customer information
-X-OpenAPI-Description: This API extracts customer info from db
-X-OpenAPI-Tags: Work with customer, Buyers, Login info
-X-OpenAPI-Parameters: name=cust_id;description=Customer ID,
- name=rdate;description=Review Date
-```
-<br>See Also:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#X-OpenAPI-Summary"><code>X-OpenAPI-Summary</code></a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#X-OpenAPI-Description"><code>X-OpenAPI-Description</code></a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#X-OpenAPI-Tags"><code>X-OpenAPI-Tags</code></a>
-
-
-</td></tr>
-
-<tr></tr>
-        <tr><td valign="top"><pre>X-Forward-To</pre>
-		<a href="#appendix-boptional-request--response-headers"><img src="https://raw.githubusercontent.com/xnbox/DeepfakeHTTP/main/img/response.svg"></a>
-        </td>
-    <td valign="top">
-    Forward client request to specified origin.<br>
-    <br>
-    Acts as a forward proxy.<br>
-    <br>
-    <i>Example:</i>
-<br>
-
-```httpx
-HTTP/1.1
-X-Forward-To: http://example.com:8080
-```
-</td></tr>
-<tr></tr>
-        <tr id="X-Handler-CGI"><td valign="top"><pre>X-Handler-CGI</pre>
-		<a href="#appendix-boptional-request--response-headers"><img src="https://raw.githubusercontent.com/xnbox/DeepfakeHTTP/main/img/response.svg"></a>
-        </td>
-    <td valign="top">
-    <strong>CGI</strong> (<strong>C</strong>ommon <strong>G</strong>ateway <strong>I</strong>nterface) program.<br>
-    <br>
-    <i>Example:</i>
-<br>
-
-```httpx
-HTTP/1.1 200 OK
-X-Handler-CGI: /home/john/myprog.sh param1 param2
-```
-<br>See Also:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#X-Handler-XGI"><code>X-Handler-XGI</code></a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#X-Handler-JS"><code>X-Handler-JS</code></a>
-</td></tr>
-<tr></tr>
-        <tr id="X-Handler-XGI"><td valign="top"><pre>X-Handler-XGI</pre>
-		<a href="#appendix-boptional-request--response-headers"><img src="https://raw.githubusercontent.com/xnbox/DeepfakeHTTP/main/img/response.svg"></a>
-        </td>
-    <td valign="top">
-    <strong>XGI</strong> (<strong>E</strong>xtended <strong>G</strong>ateway <strong>I</strong>nterface) program.<br>
-    <br>
-XGI program is very similar to CGI, but unlike CGI, the XGI program 
-reads from stdin not only the body of the request but also the first line and the headers.
-In response XGI program writes <i>status line</i>, <i>headers</i> and <i>response body </i>into stdout.<br>
-All CGI environment variables are also available to XGI program.<br>
-    <br>
-    <i>Example:</i>
-<br>
-
-```httpx
-HTTP/1.1
-X-XGI: /home/john/myprog.sh param1 param2
-```
-<br>See Also:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#X-Handler-CGI"><code>X-Handler-CGI</code></a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#X-Handler-JS"><code>X-Handler-JS</code></a>
-</td></tr>
-<tr></tr>
-        <tr id="X-Handler-JS"><td valign="top"><pre>X-Handler-JS</pre>
-		<a href="#appendix-boptional-request--response-headers"><img src="https://raw.githubusercontent.com/xnbox/DeepfakeHTTP/main/img/response.svg"></a>
-        </td>
-    <td valign="top">
-    JavaScript response handler function.<br>
-    <br>
-The JavaScript functions are taken from the context files listed in the
-<br>
-<a href="#cli-js"><code>--js &lt;file|url&gt;...</code></a> option.<br>
-<br>
-The following objects are provided as handler function parameters:<br>
-<ul>
-	<li>
-	<strong><code>request</code></strong> - <i>object</i>, <strong>READ ONLY</strong>
-	<ul>
-		<li><code>request.method</code>: <i>string</i> E.g. <code>request.method</code> ➞ <code>post</code></li>
-		<li><code>request.path</code>: <i>string</i> E.g. <code>request.path</code> ➞ <code>/api/customers</code></li>
-		<li><code>request.query</code>: <i>string</i> E.g. <code>request.query</code> ➞ <code>fname=John&lname=Doe</code></li>
-		<li><code>request.parameters</code>: <i>object</i> E.g. <code>request.parameters.fname[0]</code> ➞ <code>John</code></li>
-		<li><code>headers</code>: <i>object</i> E.g. <code>request.headers['content-type'][0]</code> ➞ <code>application/json</code></li>
-		<li><code>request.body</code>: <i>string | object</i> E.g. <code>request.body</code> ➞ <code>{"fname": "Jonh", lname: "Doe"}</code></li>
-	</ul>
-	</li>
-	<li>
-	<strong><code>response</code></strong> - <i>object</i>, <strong>READ | WRITE</strong>
-	<ul>
-		<li><code>response.status</code>: <i>number</i> E.g. <code>response.status = 200</code></li>
-		<li><code>response.headers</code>: <i>object</i> E.g. <code>response.headers['Content-Type'] = 'application/json'</code></li>
-		<li><code>response.body</code>: <i>string | object</i> E.g. <code>response.body = {"fname": "Jonh", lname: "Doe"}</code></li>
-	</ul>
-	</li>
-	<li><strong><code>data</code></strong>: <i>object</i>, <strong>READ | WRITE</strong> - persistent user data from the file provided by <code>--db</code> option</li>
-</ul>
-Among other things, the <code>X-Handler-JS</code> header allows you to modify persistent data.<br>
-<br>
-    <i>Examples:</i><br>
-<br>
-
-JavaScript function modify memory data:
-
-```httpx
-DELETE /customers/{id}
-
-HTTP/1.1 200 OK
-X-Handler-JS: deleteCustomer
-Content-Type: application/json
-
-{"id": "${request.parameters.id[0]}"};
-
-```
-
-```js
-function deleteCustomer(request, response, data) {
-    const id = request.parameters.id[0];
-    delete data.customers[id];
+{
+* Clone repo or unpack project zip file to a 'rules_migrator' folder. 
+  * Cloning steps:
+  * Unzipping steps: 
 }
-```
-<h2></h2>
-JavaScript function modify memory data and provide response status, headers and body:
 
-```httpx
-DELETE /customers/{id}
-
-HTTP/1.1
-X-Handler-JS: deleteCustomer
+Geting python environment set-up:
+* Tool is written and tested with Python 3.10.
+* Uses `requests` and `PyYAML` packages as noted in the requirements.txt project file. These packages can be installed by running the following commands in the project's root directory. 
 
 ```
-
-```js
-function deleteCustomer(request, response, data) {
-    const id = request.parameters.id[0];
-    if (data.customers[id] === undefined) {
-        response.status = 404;
-        response.body = {error: true, message: 'ID not found'};
-    }
-    delete data.customers[id];
-    response.status = 200;
-    response.headers['Content-Type'] = 'application/json';
-    response.body = {error: false, message: null};
-}
+pip3 install requests
+pip3 install PyYAML
+pip3 install -r requirements.txt
+```
+* Create logs directory
+```
+mkdir logs
 ```
 
-<br>See Also:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cli-js"><code>--js &lt;file|url&gt;...</code></a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cli-db"><code>--db &lt;file|url&gt;...</code></a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#X-Handler-CGI"><code>X-Handler-CGI</code></a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#X-Handler-XGI"><code>X-Handler-XGI</code></a>
-<img width="1000" height="0">
-</td></tr>
-</table>
-<br>
+### Testing the Rules Migrator tool
 
->**NOTE:**<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. Optional request headers will **not** be sent to the server engine.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. Optional response headers will **not** be sent to clients.
+From the project's root folder try running the following command in the terminal:
 
-<p align="right"><a href="#start"><img width="45rem" src="https://raw.githubusercontent.com/xnbox/DeepfakeHTTP/main/img/top.png"></a></p>
+```
+python3 rules_migrator.py --help
+```
+
+If you get a message about how to use the tool, that's a good sign the tool is ready for use and it's time to start configuring it. 
+
+
+
+## rule_migrator.py command-line script
+
+The root folder of this project includes a ```rules_migrator.py``` Python command-line script. This script has the following command-line options:
+
+```
+Usage:
+    rules-migrator [--config <config>] [--mode <mode>]
+    rules-migrator --help
+    rules-migrator --version
+
+Options:
+    -c --config CONFIG    Location of YAML configuration (file). Defines 'source' and 'destination' rules systems. Defaults to `./config/config.yaml`.
+    -m --mode MODE        Options: `test` or `transfer`. Defaults to `test`.
+    -h --help
+    -v --version
+
+    https://github.com/twitterdev/rules-migrator
+```
+
+Example usage:
+
+* ```$python rules_migrator.py --mode test``` 
+
+--> Retrieves 'source' rules, and tests them with the 'dry_run' option on the 'destination' v2 rules endpoint. Since 'test' is the default mode, this command is equivalent: ```$python rules_migrator.py```. Also, since no configuration filepath is provided, a default filepath of ```./config/config.yaml``` is used. 
+
+* ```$python rules_migrator.py --mode transfer``` 
+
+--> Retrieves 'source' rules, tests them with the 'dry_run' option, removes any that are unsupported with v2
+  and writes them to the 'destination' v2 Filtered stream. 
+  
+* ```$python rules_migrator.py --mode transfer --config './my_configs/pt_prod_to_v2_staging.yaml``` 
+
+--> Same as above except that a custom location and name of a configuration file is provided. This enables having multiple configuration files, each describing a unique source/destination combo.  
+  
+This `rules_migrator.py` script creates a single RulesMigrator object from the `/lib/rules_migrator.py` class file, and calls the `migrate` method. See below for more details of the core objects defined in that class file.   
+
+### Configuration
+
+When running as a command-line script, a YAML configuration file is used to define the 'source' and 'destination' streams (and their rules endpoints). This configuration file is also used to set options, such as the default 'mode' the tool runs in. 
+
+The script uses `./config/config.yaml` as the default configuration filepath. This project includes an example configuration file at `./config/config.yaml:  
+
+```yaml
+source: 
+  url: https://gnip-api.twitter.com/rules/powertrack/accounts/{ACCOUNT_NAME}/publishers/twitter/{LABEL}.json
+  #url: ./rules/source/my_current_rules.jon
+
+destination: 
+  url: https://api.twitter.com/2/tweets/search/stream/rules
+  #url:  ./rules/destination/rules_to_add.json
+
+options: 
+  mode: test #Other options: transfer #This will commonly be overwriten on command-line.
+    
+```
+
+### Setting up authentication 
+
+Twitter API credentials are read in from the local environment. Authentication details for two "rules" systems are needed to use this migration tool, one for a 'source' system and one for a 'destination' system. While 'source' systems can be either PowerTrack-based or v2-based, this tool is designed to only migrate rules to a v2 Filtered stream.
+
+These details are needed:
++ SOURCE_TOKEN - Either a Bearer token or, for reading from PowerTrack stream, a username for BASIC authentication.
++ SOURCE_PASSWORD - For reading from PowerTrack, a password for BASIC authentication.
++ DESTINATION_TOKEN - Bearer token for App writing to a v2 Filter stream rules endpoint.
+
+On Linux and MacOS, these can be set with the ```export``` command, e.g.:
+
+```
+export DESTINATION_TOKEN='AAAAAAAAAAAAAAAAAAAAAPPBearerToken"
+export SOURCE_TOKEN='prod@here.com'
+export SOURCE PASSWORD='NotMyPassWord'
+```
+
+When running as a command-line script, these variables need to be available in the local environment. 
+
+This tool loads these tokens into a 'creds' dictionary: 
+
+```python
+creds['DESTINATION_TOKEN'] = os.environ.get("DESTINATION_TOKEN")
+```
+
+When running as a Flask App, these variables also need to be available from its local environment. If you are deploying this code on Glitch or Heroku, or basically anywhere on the cloud, securely storing credentials in the local environment is readily supported. 
+
+Support for having multiple configuration files. This requires the reading of authentication tokens from more than two Filtered stream instances. Each config could provide a 'token name' pointer so we know what token to associate with a source system. 
+
+```yaml
+source: 
+  url: https://api.twitter.com/2/tweets/search/stream/rules
+  token_pointer: SOURCE_TOKEN_DEV 
+
+destination: 
+  url: https://api.twitter.com/2/tweets/search/stream/rules
+  token_pointer: DESTINATION_TOKEN_STAGING
+```
+
+
+# (more) internal docs
+
+Notes that a developer may be interested in: 
+
+
+### RulesMigrator library and its core object
+
+The heart of this code lives in the **/lib/rules_migrator.py** file. This file defines three core class:
++ **RulesRequester** - This object knows how to make requests to Twitter rules endpoints (PowerTrack and v2 Filtered stream).
++ **RulesSystem** - This object enscapsulates a rules "system", and there is always a 'source' and a 'destination' system when migrating. Each object has its own requester object and also holds fundamental system stats.
++ **RulesMigrator** - This object exposes a 'migrate' method used by calling process (see below). This object also knows how to load credentials and make reports. 
+
+In this project's main directory, there are these three files:
+
++ **rules_migrator.py** - This is the MVP command-line script that both tests and transfers rules. This script is a wrapped to the underlying /lib/rules_migrator.py class file. See below for example usage. 
++ **rm_app.py** = This is a Flask app that provides a web frontend to the underlying /lib/rules_migrator.py class file. It's main purpose is to provide a /migrate route for other web apps/UIs to call. Those callers need to pass a JSON object that describes the 'source' and 'destination' system and migration options. Migration options include the execution 'mode', either 'test' or 'transfer.' The test mode uses the v2 'dry run' option to check on the readiness of the source rules to be migrated to v2. The transfer mode actually transfers the source rules, automatically removing any unsupported rules if needed. 
++ **test_rm_app.py** - A simple example app that makes a *migrate* request to the rm_app Flask app.    
+
+### RulesMigrator.migrate method
+
+The migrate method provided by the RulesMigrator class is the "main" entry point for calling components. Both the command-line script and the Flask app have this code for providing configuration details and receiving back a report.
+
+```python
+from lib.rules_migrator import RulesMigrator
+
+rm = RulesMigrator(config_json)
+report = rm.migrate(mode)  # What mode are we running in? Testing rules? Transferring rules? 
+```
+
+
+### Report writing
+
+The migrate method has a primary job of sending back a report. This method is called, a report is started, the tool builds a summary of actions taken and generates lists of different rule types (supported, unsupported, duplicate, and translated). These report attributes are marked up in JSON and returned to the caller (e.g. command-line script or Flask app). 
+
+As the tool moves through the migration steps, it appends updates to a simple string 'summary' variable:
+
+```python
+summary = f"{summary}\n{ruleset_summary}"
+```
+
+Embedding new lines and tabs enables some level of formatting. Fine-tuning the final format is clumsy. Testing with very large data sets is key here. There needs to a limit to the number of rules any set has, e.g. the number of duplicate and supported rules in the report are limited to 20 examples.   
+
+
+
